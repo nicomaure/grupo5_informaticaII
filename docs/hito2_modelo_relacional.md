@@ -80,6 +80,8 @@ Las PK son simples (`id`), así que no hay dependencias parciales respecto de la
 
 **Sobre `UNIQUE (id, id_pregunta)` en `opcion`:** no introduce redundancia. `id` ya es único; esta restricción no agrega datos, solo da un destino a la FK compuesta que impone la regla R3.
 
+**Política ON UPDATE:** todas las claves foráneas usan `ON UPDATE RESTRICT`. Los `id` son artificiales (AUTO_INCREMENT) y no tienen significado en el juego, así que nunca se modifican; si alguien intenta cambiar un `id` que otra tabla está usando, la base lo rechaza. La política `ON DELETE` de cada FK se indica en el diccionario.
+
 ## 4. Diccionario de datos
 
 ### jugador — quien juega
