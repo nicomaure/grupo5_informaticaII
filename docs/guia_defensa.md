@@ -14,6 +14,7 @@ Cada integrante debería poder responder estas preguntas y hacer al menos un cam
 | ¿Por qué un trigger y no un CHECK? | El CHECK solo mira la fila actual. Si la regla necesita contar filas o leer otra tabla (R2, R4, R5, R6), hace falta trigger. |
 | ¿Qué pasa si se corta a la mitad al crear una partida? | Está dentro de una transacción en `sp_iniciar_partida`: o se crea completa o `ROLLBACK` (R8). |
 | ¿RESTRICT o CASCADE? | CASCADE donde la fila hija no tiene sentido sola (opciones de una pregunta, preguntas de una partida). RESTRICT donde borrar dejaría historia sin sentido (no se borra un jugador con partidas ni una categoría con preguntas). |
+| ¿Y el ON UPDATE? | `ON UPDATE RESTRICT` en todas las FK. Los `id` son artificiales y nunca se cambian; si alguien intenta cambiar uno que está referenciado, la base lo rechaza en vez de propagar el cambio. |
 | ¿Qué hace la app PHP si la base rechaza algo? | Muestra el mensaje del error (`SIGNAL` R2…R6, FK, UNIQUE, CHECK). La validación está en la base, no en PHP. |
 
 ## Explicar cada consulta (sección 8 del script)

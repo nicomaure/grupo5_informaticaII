@@ -64,7 +64,7 @@ CREATE TABLE categoria (
     descripcion        VARCHAR(200) NULL,
     id_categoria_padre INT          NULL,
     CONSTRAINT fk_categoria_padre FOREIGN KEY (id_categoria_padre)
-        REFERENCES categoria (id) ON DELETE RESTRICT
+        REFERENCES categoria (id) ON DELETE RESTRICT ON UPDATE RESTRICT
 ) ENGINE = InnoDB;
 
 -- DIFICULTAD: tabla propia para no repetir "puntos" en cada pregunta (3FN):
@@ -95,6 +95,9 @@ CREATE TABLE modo_juego (
 -- estado BORRADOR = se esta cargando (no sale en partidas).
 -- estado ACTIVA   = lista para jugar (la base exige exactamente 1 opcion correcta).
 -- RESTRICT hacia categoria y dificultad: no se pierden preguntas por un borrado.
+-- ON UPDATE RESTRICT en TODAS las FK del script: los id son artificiales
+--   (AUTO_INCREMENT) y nunca se cambian; si alguien intenta cambiar un id que
+--   esta referenciado, la base lo rechaza en vez de propagarlo.
 CREATE TABLE pregunta (
     id            INT AUTO_INCREMENT PRIMARY KEY,
     enunciado     VARCHAR(255) NOT NULL UNIQUE,
@@ -104,9 +107,9 @@ CREATE TABLE pregunta (
     id_dificultad INT          NOT NULL,
     CONSTRAINT chk_pregunta_estado CHECK (estado IN ('BORRADOR', 'ACTIVA')),
     CONSTRAINT fk_pregunta_categoria FOREIGN KEY (id_categoria)
-        REFERENCES categoria (id) ON DELETE RESTRICT,
+        REFERENCES categoria (id) ON DELETE RESTRICT ON UPDATE RESTRICT,
     CONSTRAINT fk_pregunta_dificultad FOREIGN KEY (id_dificultad)
-        REFERENCES dificultad (id) ON DELETE RESTRICT
+        REFERENCES dificultad (id) ON DELETE RESTRICT ON UPDATE RESTRICT
 ) ENGINE = InnoDB;
 
 -- OPCION: alternativas de cada pregunta (relacion 1:N "tiene").
@@ -124,7 +127,7 @@ CREATE TABLE opcion (
     CONSTRAINT uq_opcion_pregunta_texto UNIQUE (id_pregunta, texto),
     CONSTRAINT uq_opcion_id_pregunta UNIQUE (id, id_pregunta),
     CONSTRAINT fk_opcion_pregunta FOREIGN KEY (id_pregunta)
-        REFERENCES pregunta (id) ON DELETE CASCADE
+        REFERENCES pregunta (id) ON DELETE CASCADE ON UPDATE RESTRICT
 ) ENGINE = InnoDB;
 
 -- PARTIDA: cada intento de un jugador, en un modo y una categoria.
@@ -146,11 +149,11 @@ CREATE TABLE partida (
         (estado = 'FINALIZADA' AND fecha_fin IS NOT NULL AND fecha_fin >= fecha_inicio)
     ),
     CONSTRAINT fk_partida_jugador FOREIGN KEY (id_jugador)
-        REFERENCES jugador (id) ON DELETE RESTRICT,
+        REFERENCES jugador (id) ON DELETE RESTRICT ON UPDATE RESTRICT,
     CONSTRAINT fk_partida_modo FOREIGN KEY (id_modo_juego)
-        REFERENCES modo_juego (id) ON DELETE RESTRICT,
+        REFERENCES modo_juego (id) ON DELETE RESTRICT ON UPDATE RESTRICT,
     CONSTRAINT fk_partida_categoria FOREIGN KEY (id_categoria)
-        REFERENCES categoria (id) ON DELETE RESTRICT
+        REFERENCES categoria (id) ON DELETE RESTRICT ON UPDATE RESTRICT
 ) ENGINE = InnoDB;
 
 -- PARTIDA_PREGUNTA: RELACION N:M CON ATRIBUTOS PROPIOS entre partida y pregunta.
@@ -177,11 +180,11 @@ CREATE TABLE partida_pregunta (
     CONSTRAINT uq_pp_partida_pregunta UNIQUE (id_partida, id_pregunta),
     CONSTRAINT uq_pp_partida_orden UNIQUE (id_partida, orden),
     CONSTRAINT fk_pp_partida FOREIGN KEY (id_partida)
-        REFERENCES partida (id) ON DELETE CASCADE,
+        REFERENCES partida (id) ON DELETE CASCADE ON UPDATE RESTRICT,
     CONSTRAINT fk_pp_pregunta FOREIGN KEY (id_pregunta)
-        REFERENCES pregunta (id) ON DELETE RESTRICT,
+        REFERENCES pregunta (id) ON DELETE RESTRICT ON UPDATE RESTRICT,
     CONSTRAINT fk_pp_opcion_de_pregunta FOREIGN KEY (id_opcion_elegida, id_pregunta)
-        REFERENCES opcion (id, id_pregunta) ON DELETE RESTRICT
+        REFERENCES opcion (id, id_pregunta) ON DELETE RESTRICT ON UPDATE RESTRICT
 ) ENGINE = InnoDB;
 
 -- =============================================================================
