@@ -51,7 +51,7 @@ grupo5_informaticaII/
 3. Pestaña **Importar** → elegir `sql/desafio_sala5.sql` → **Importar**.
 4. Al terminar deben aparecer 8 tablas y 4 vistas. Se puede re-importar cuantas veces haga falta: el script borra y vuelve a crear todo.
 
-> El script no tiene `CREATE DATABASE` porque el usuario `grupo5` solo tiene permisos sobre la base `grupo5`.
+> El script usa `grupo5` si ya existe; de lo contrario, intenta crearla.
 
 ### 2. Publicar la aplicación (git clone)
 
@@ -100,11 +100,10 @@ Después, en `config.local.php`, poner `'db_user' => 'juego5'` y su clave. Ese u
 Requisitos: MariaDB 10.6+ (o MySQL 8) y PHP 8.1+ con la extensión `pdo_mysql`.
 
 ```bash
-# 1. Base y usuario
-sudo mariadb -e "CREATE DATABASE grupo5 CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-                 CREATE USER 'grupo5'@'localhost' IDENTIFIED BY 'clave';
+# 1. Usuario y permisos (el script SQL crea la db)
+sudo mariadb -e "CREATE USER 'grupo5'@'localhost' IDENTIFIED BY 'clave';
                  GRANT ALL PRIVILEGES ON grupo5.* TO 'grupo5'@'localhost';"
-mariadb -ugrupo5 -pclave grupo5 < sql/desafio_sala5.sql
+mariadb -ugrupo5 -pclave < sql/desafio_sala5.sql
 
 # 2. Configuración
 cp app/config.example.php app/config.local.php   # poner 'clave' en db_pass
@@ -147,4 +146,3 @@ Para probarlas: `sql/pruebas_reglas.sql` (ejecutar las sentencias de a una en la
 **La app no repite estas reglas.** `iniciar.php` y `responder.php` solo llaman a `sp_iniciar_partida` y `sp_responder`; si la base rechaza algo, se muestra su mensaje.
 
 ---
-

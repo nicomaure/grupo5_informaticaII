@@ -3,7 +3,7 @@
 -- Proyecto "Una base de datos que se juega" - Informatica II - UNNE
 -- Grupo Sala 5: Elias Aguero, Edgardo Molina, Nicolas Maure, Gabriel Martinez Canepa
 --
--- Script unico (Hito 3): ejecutado sobre la base vacia deja todo listo.
+-- Script unico (Hito 3): crea la db si no existe y deja todo listo.
 --   1. Tablas independientes
 --   2. Tablas dependientes (FK por id)
 --   3. Reglas del juego impuestas en la base (triggers)
@@ -14,10 +14,24 @@
 --   8. Diez consultas con enunciado
 --
 -- Motor: MariaDB 10.6 o superior (probado en 10.11 / 11.x).
--- Como importarlo: phpMyAdmin > base grupo5 > Importar > este archivo.
--- (El usuario grupo5 no puede crear bases nuevas, por eso no hay
---  DROP/CREATE DATABASE: se trabaja dentro de la base grupo5.)
+-- Si la base grupo5 ya existe y es visible, no intenta crearla.
+-- Si no existe, necesita permiso CREATE para crearla.
+-- Se requieren permisos para recrear los objetos del juego dentro de grupo5.
+-- Reimportar borra y vuelve a crear las tablas y los datos del juego.
 -- =============================================================================
+
+SET @sql = IF(
+    EXISTS (
+        SELECT 1
+        FROM information_schema.SCHEMATA
+        WHERE SCHEMA_NAME = 'grupo5'
+    ),
+    'DO 0',
+    'CREATE DATABASE IF NOT EXISTS grupo5 CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci'
+);
+PREPARE st FROM @sql;
+EXECUTE st;
+DEALLOCATE PREPARE st;
 
 USE grupo5;
 
